@@ -1,9 +1,13 @@
 name: Sync Forks
 
 on:
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        required: false
+        default: 'sync_fork'
   schedule:
     - cron: '*/5 * * * *'
-  workflow_dispatch:
 
 jobs:
   sync:
