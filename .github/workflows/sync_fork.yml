@@ -1,6 +1,9 @@
 name: Sync Forks
 
 on:
+  push:
+    branches:
+    - sync-fork-bot
   schedule:
     - cron: '*/5 * * * *'
   workflow_dispatch:
