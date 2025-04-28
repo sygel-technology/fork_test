@@ -1,0 +1,36 @@
+name: Sync Forks
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout fork repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Git
+        run: |
+          git config user.name "sygel-bot"
+          git config user.email "sy-bot@sygel.es"
+
+      - name: Add upstream and fetch all branches
+        run: |
+          git remote add upstream https://github.com/manuel-florido/$(basename "${{ github.repository }}").git
+          git fetch upstream --prune
+
+      - name: Sync all branches
+        run: |
+          # Sincronizar todas las ramas que existen en origin
+          for branch in $(git branch -r | grep 'origin/' | grep -v 'HEAD' | sed 's|origin/||'); do
+            echo "Processing branch: $branch"
+            git checkout $branch || git checkout -b $branch origin/$branch
+            git merge --no-edit upstream/$branch || echo "No upstream branch $branch, skipping merge."
+            git push origin $branch
+          done
